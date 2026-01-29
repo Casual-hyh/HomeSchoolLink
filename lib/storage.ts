@@ -52,6 +52,12 @@ export async function uploadFile(file: File): Promise<UploadResult> {
 
   if (provider === "supabase") {
     try {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+      const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+      if (!url || !key) {
+        return { provider, storageKey: `supabase/${uid("media")}`, status: "error", error: "缺少 Supabase 环境变量" };
+      }
+
       const { supabase } = await import("./supabaseClient");
       if (!supabase) {
         return { provider, storageKey: `supabase/${uid("media")}`, status: "error", error: "Supabase 未配置" };

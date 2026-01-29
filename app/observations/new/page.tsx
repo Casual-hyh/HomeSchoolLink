@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -27,10 +27,6 @@ export default function NewObservationPage() {
   const indicators = useMemo(() => snap.indicators.filter((i) => i.domainId === domainId), [snap, domainId]);
   const selectedChild = useMemo(() => snap.children.find((c) => c.id === childId), [snap, childId]);
   const selectedDomain = useMemo(() => snap.domains.find((d) => d.id === domainId), [snap, domainId]);
-
-  function toggleIndicator(id: string) {
-    setIndicatorIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-  }
 
   async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -79,6 +75,8 @@ export default function NewObservationPage() {
     );
     router.push("/observations");
   }
+
+  const failedUploads = media.filter((m) => m.uploadStatus === "error");
 
   return (
     <div className="space-y-6">
@@ -131,32 +129,39 @@ export default function NewObservationPage() {
               <div>
                 <div className="text-xs text-slate-500 mb-1">附件（可选）</div>
                 <Input type="file" multiple onChange={onFiles} />
-            {media.length ? (
-              <div className="mt-2 space-y-2">
-                <div className="flex flex-wrap gap-2">
-                  {media.map((m) => (
-                    <Tag key={m.id}>
-                      {m.kind}:{m.name} {m.uploadStatus === "pending" ? "· 待上传" : m.uploadStatus === "error" ? "· 上传失败" : ""}
-                    </Tag>
-                  ))}
-                </div>
-                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                  {media
-                    .filter((m) => m.kind === "image" && m.publicUrl)
-                    .map((m) => (
-                      <img
-                        key={m.id}
-                        src={m.publicUrl}
-                        alt={m.name}
-                        className="h-20 w-full rounded-xl object-cover"
-                      />
-                    ))}
-                </div>
+                {media.length ? (
+                  <div className="mt-2 space-y-2">
+                    <div className="flex flex-wrap gap-2">
+                      {media.map((m) => (
+                        <Tag key={m.id}>
+                          {m.kind}:{m.name} {m.uploadStatus === "pending" ? "· 待上传" : m.uploadStatus === "error" ? "· 上传失败" : ""}
+                        </Tag>
+                      ))}
+                    </div>
+                    {failedUploads.length ? (
+                      <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+                        有 {failedUploads.length} 个附件上传失败：
+                        {failedUploads.map((m) => ` ${m.name}`)}
+                        。请检查环境变量、Bucket 策略与网络后重试。
+                      </div>
+                    ) : null}
+                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                      {media
+                        .filter((m) => m.kind === "image" && m.publicUrl)
+                        .map((m) => (
+                          <img
+                            key={m.id}
+                            src={m.publicUrl}
+                            alt={m.name}
+                            className="h-20 w-full rounded-xl object-cover"
+                          />
+                        ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-xs text-slate-500 mt-1">当前仅保存附件元数据；后续接存储后可上传与预览。</div>
+                )}
               </div>
-            ) : (
-              <div className="text-xs text-slate-500 mt-1">当前仅保存附件元数据；后续接存储后可上传与预览。</div>
-            )}
-          </div>
 
               <div className="md:col-span-2">
                 <div className="text-xs text-slate-500 mb-1">文字记录</div>
