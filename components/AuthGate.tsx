@@ -20,8 +20,14 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     let active = true;
 
     async function check() {
-      if (!supabase || isPublic(pathname)) {
+      if (isPublic(pathname)) {
         if (active) setChecking(false);
+        return;
+      }
+
+      if (!supabase) {
+        const next = encodeURIComponent(pathname);
+        router.replace(`/login?next=${next}`);
         return;
       }
 
