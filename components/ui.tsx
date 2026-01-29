@@ -16,10 +16,11 @@ export function Card({
   return (
     <section
       className={
-        "rounded-2xl border border-white/70 bg-white/70 p-4 shadow-[0_20px_60px_-55px_rgba(15,23,42,0.6)] backdrop-blur " +
+        "group relative overflow-hidden rounded-2xl border border-white/70 bg-white/70 p-4 shadow-[0_20px_60px_-55px_rgba(15,23,42,0.6)] backdrop-blur transition hover:-translate-y-0.5 hover:shadow-[0_30px_80px_-60px_rgba(15,23,42,0.7)] " +
         className
       }
     >
+      <div className="pointer-events-none absolute inset-x-0 -top-24 h-24 bg-gradient-to-r from-cyan-200/40 via-white/10 to-emerald-200/30 opacity-0 transition group-hover:opacity-100" />
       {title ? (
         <div className="mb-3 flex items-center justify-between">
           <div className="text-sm font-semibold">{title}</div>

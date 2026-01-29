@@ -15,10 +15,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="zh-CN">
       <body className="min-h-screen text-slate-900">
-        <div className="pointer-events-none fixed inset-0 -z-10">
-          <div className="absolute -right-20 -top-40 h-[520px] w-[520px] rounded-full bg-gradient-to-br from-cyan-200/50 via-white/20 to-emerald-200/40 blur-3xl" />
-          <div className="absolute -left-40 bottom-[-160px] h-[520px] w-[520px] rounded-full bg-gradient-to-br from-amber-200/40 via-white/10 to-sky-200/40 blur-3xl" />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] bg-[size:36px_36px] opacity-60" />
+        <div className="aurora-bg">
+          <div className="aurora-orb orb-1" />
+          <div className="aurora-orb orb-2" />
+          <div className="aurora-grid" />
+          <div className="aurora-noise" />
         </div>
 
         <Providers>
