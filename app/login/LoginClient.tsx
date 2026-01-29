@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -146,6 +146,14 @@ export default function LoginClient() {
             <div>已检测到 Supabase 配置，可进行登录。</div>
           )}
           {status ? <div className="mt-3 text-xs text-slate-500">{status}</div> : null}
+        </div>
+      </Card>
+
+      <Card title="常见问题">
+        <div className="space-y-2 text-xs text-slate-500">
+          <div>没收到邮件：请检查垃圾邮箱或稍后重试。</div>
+          <div>访问被拦截：登录后会自动跳回原页面。</div>
+          <div>内部演示：可创建测试账号邮箱进行体验。</div>
         </div>
       </Card>
     </div>

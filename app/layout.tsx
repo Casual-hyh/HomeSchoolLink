@@ -4,6 +4,7 @@ import Link from "next/link";
 import Providers from "./providers";
 import AppNav from "@/components/AppNav";
 import RoutePrefetch from "@/components/RoutePrefetch";
+import UserMenu from "@/components/UserMenu";
 
 export const metadata: Metadata = {
   title: "HomeSchoolLink · 过程性评价平台",
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     >
                       新建观察
                     </Link>
+                    <UserMenu />
                   </div>
                 </div>
                 <AppNav variant="mobile" />
