@@ -28,6 +28,10 @@ export default function NewObservationPage() {
   const selectedChild = useMemo(() => snap.children.find((c) => c.id === childId), [snap, childId]);
   const selectedDomain = useMemo(() => snap.domains.find((d) => d.id === domainId), [snap, domainId]);
 
+  function toggleIndicator(id: string) {
+    setIndicatorIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }
+
   async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     const items: MediaItem[] = await Promise.all(
