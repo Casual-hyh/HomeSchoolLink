@@ -1,4 +1,4 @@
-export type StorageProvider = "local" | "r2" | "minio";
+export type StorageProvider = "local" | "supabase" | "r2" | "minio";
 export type UploadStatus = "ready" | "pending" | "error";
 
 export type UploadResult = {
@@ -11,6 +11,7 @@ export type UploadResult = {
 
 function getProvider(): StorageProvider {
   const raw = (process.env.NEXT_PUBLIC_STORAGE_PROVIDER || "local").toLowerCase();
+  if (raw === "supabase") return "supabase";
   if (raw === "r2") return "r2";
   if (raw === "minio") return "minio";
   return "local";
@@ -43,6 +44,31 @@ export async function uploadFile(file: File): Promise<UploadResult> {
       }
     }
     return { provider, storageKey, status: "ready" };
+  }
+
+  if (provider === "supabase") {
+    try {
+      const { supabase } = await import("./supabaseClient");
+      if (!supabase) {
+        return { provider, storageKey: `supabase/${uid("media")}`, status: "error", error: "Supabase 未配置" };
+      }
+
+      const bucket = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || "media";
+      const storageKey = `images/${Date.now()}_${safeName(file.name)}`;
+      const { error } = await supabase.storage.from(bucket).upload(storageKey, file, {
+        contentType: file.type || "application/octet-stream",
+        upsert: false,
+      });
+
+      if (error) {
+        return { provider, storageKey, status: "error", error: error.message };
+      }
+
+      const { data } = supabase.storage.from(bucket).getPublicUrl(storageKey);
+      return { provider, storageKey, publicUrl: data.publicUrl, status: "ready" };
+    } catch (error) {
+      return { provider, storageKey: `supabase/${uid("media")}`, status: "error", error: (error as Error).message };
+    }
   }
 
   if (provider === "r2") {

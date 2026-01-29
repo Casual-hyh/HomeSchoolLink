@@ -26,7 +26,7 @@ export type MediaItem = {
   name: string;
   size: number;
   lastModified: number;
-  provider?: "local" | "r2" | "minio";
+  provider?: "local" | "supabase" | "r2" | "minio";
   storageKey?: string;
   publicUrl?: string;
   uploadStatus?: "ready" | "pending" | "error";
