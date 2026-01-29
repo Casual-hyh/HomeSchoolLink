@@ -116,7 +116,7 @@ export default function AppNav({ variant = "sidebar" }: { variant?: "sidebar" | 
                     <span
                       className={
                         "mt-2 h-2 w-2 rounded-full " +
-                        (active ? "bg-emerald-300" : "bg-slate-300 group-hover:bg-slate-400")
+                        (active ? "bg-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.8)]" : "bg-slate-300 group-hover:bg-slate-400")
                       }
                     />
                     <span>

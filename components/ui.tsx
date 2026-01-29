@@ -16,11 +16,13 @@ export function Card({
   return (
     <section
       className={
-        "group relative overflow-hidden rounded-2xl border border-white/70 bg-white/70 p-4 shadow-[0_20px_60px_-55px_rgba(15,23,42,0.6)] backdrop-blur transition hover:-translate-y-0.5 hover:shadow-[0_30px_80px_-60px_rgba(15,23,42,0.7)] " +
+        "group relative overflow-hidden rounded-2xl p-4 backdrop-blur transition hover:-translate-y-0.5 " +
+        "glass-edge " +
         className
       }
     >
       <div className="pointer-events-none absolute inset-x-0 -top-24 h-24 bg-gradient-to-r from-cyan-200/40 via-white/10 to-emerald-200/30 opacity-0 transition group-hover:opacity-100" />
+      <span className="shimmer group-hover:opacity-100" />
       {title ? (
         <div className="mb-3 flex items-center justify-between">
           <div className="text-sm font-semibold">{title}</div>
@@ -48,7 +50,7 @@ export function Button(
         base +
         " " +
         sizeCls +
-        " bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white shadow-sm hover:translate-y-[-1px] hover:shadow-md " +
+        " bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white shadow-[0_16px_40px_-24px_rgba(15,23,42,0.9)] hover:translate-y-[-1px] hover:shadow-[0_24px_60px_-30px_rgba(15,23,42,0.9)] " +
         className
       );
     }
@@ -107,7 +109,7 @@ export function Tag({ children, className = "" }: { children: React.ReactNode; c
   return (
     <span
       className={
-        "inline-flex items-center rounded-full bg-slate-900/5 px-2 py-0.5 text-xs text-slate-600 " +
+        "inline-flex items-center rounded-full border border-white/60 bg-white/70 px-2 py-0.5 text-xs text-slate-600 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.7)] " +
         className
       }
     >
