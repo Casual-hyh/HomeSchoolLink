@@ -63,7 +63,12 @@ export function Button(
     return base + " " + sizeCls + " bg-transparent hover:bg-white/80 border border-white/70 text-slate-700 " + className;
   }, [variant, size, className]);
 
-  return <button className={cls} {...rest} />;
+  return (
+    <button className={cls} {...rest}>
+      <span className="relative z-10">{props.children}</span>
+      <span className="absolute inset-0 opacity-0 transition group-hover:opacity-100" />
+    </button>
+  );
 }
 
 export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
@@ -71,7 +76,7 @@ export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       className={
-        "w-full rounded-xl border border-slate-200/70 bg-white/80 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-300/60 " +
+        "w-full rounded-xl border border-slate-200/70 bg-white/80 px-3 py-2 text-sm outline-none transition focus:-translate-y-0.5 focus:ring-2 focus:ring-slate-300/60 " +
         className
       }
       {...rest}
@@ -84,7 +89,7 @@ export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       className={
-        "w-full rounded-xl border border-slate-200/70 bg-white/80 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-300/60 " +
+        "w-full rounded-xl border border-slate-200/70 bg-white/80 px-3 py-2 text-sm outline-none transition focus:-translate-y-0.5 focus:ring-2 focus:ring-slate-300/60 " +
         className
       }
       {...rest}
@@ -97,7 +102,7 @@ export function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement
   return (
     <textarea
       className={
-        "w-full rounded-xl border border-slate-200/70 bg-white/80 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-300/60 " +
+        "w-full rounded-xl border border-slate-200/70 bg-white/80 px-3 py-2 text-sm outline-none transition focus:-translate-y-0.5 focus:ring-2 focus:ring-slate-300/60 " +
         className
       }
       {...rest}

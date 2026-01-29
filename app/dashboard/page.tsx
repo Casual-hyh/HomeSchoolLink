@@ -35,10 +35,10 @@ export default function DashboardPage() {
         subtitle="用证据驱动的过程性评价，把观察、指标、报告与家园协作连接起来。"
         actions={
           <>
-            <Link className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50" href="/observations">
+            <Link className="action-chip" href="/observations">
               查看观察
             </Link>
-            <Link className="rounded-full border border-slate-900 bg-slate-900 px-4 py-2 text-xs font-medium text-white hover:bg-slate-800" href="/observations/new">
+            <Link className="action-chip" href="/observations/new">
               新建观察
             </Link>
           </>
@@ -88,7 +88,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <Card title="最近记录" action={<Link className="text-xs text-slate-500 hover:text-slate-700" href="/observations">查看全部</Link>}>
+      <Card title="最近记录" action={<Link className="action-chip" href="/observations">查看全部</Link>}>
         {recent.length === 0 ? (
           <div className="text-sm text-slate-500">
             还没有记录。你可以从 <Link className="underline" href="/observations/new">新建观察</Link> 开始跑通流程。

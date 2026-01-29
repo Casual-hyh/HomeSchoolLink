@@ -55,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <AppNav variant="mobile" />
               </header>
 
-              <div className="mx-auto max-w-6xl px-4 py-8">{children}</div>
+              <div className="mx-auto max-w-6xl px-4 py-8 page-reveal">{children}</div>
 
               <footer className="border-t border-slate-200/70 bg-white/70">
                 <div className="mx-auto max-w-6xl px-4 py-4 text-xs text-slate-500">

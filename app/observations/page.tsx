@@ -40,7 +40,7 @@ export default function ObservationsPage() {
         title="观察中心"
         subtitle="快速记录 + 指标对照。让每条证据进入可分析、可汇总、可追踪的闭环。"
         actions={
-          <Link className="rounded-full border border-slate-900 bg-slate-900 px-4 py-2 text-xs font-medium text-white hover:bg-slate-800" href="/observations/new">
+          <Link className="action-chip" href="/observations/new">
             新建观察
           </Link>
         }
@@ -74,7 +74,7 @@ export default function ObservationsPage() {
           </div>
         </Card>
 
-        <Card title={`记录列表（${list.length}）`} action={<Link className="text-xs text-slate-500 hover:text-slate-700" href="/observations/new">+ 新建</Link>}>
+        <Card title={`记录列表（${list.length}）`} action={<Link className="action-chip" href="/observations/new">+ 新建</Link>}>
           {list.length === 0 ? (
             <div className="text-sm text-slate-500">
               暂无记录。先去 <Link className="underline" href="/observations/new">新建观察</Link>。
