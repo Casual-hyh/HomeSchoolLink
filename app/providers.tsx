@@ -2,11 +2,12 @@
 
 import { useEffect } from "react";
 import { ensureSeed } from "@/lib/seed";
+import AuthGate from "@/components/AuthGate";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     ensureSeed();
   }, []);
 
-  return <>{children}</>;
+  return <AuthGate>{children}</AuthGate>;
 }

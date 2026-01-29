@@ -17,6 +17,7 @@ export default function AuthCallbackPage() {
 
       const url = new URL(window.location.href);
       const code = url.searchParams.get("code");
+      const next = url.searchParams.get("next") || "/dashboard";
       if (!code) {
         setMsg("未发现 code 参数，无法完成登录。");
         return;
@@ -28,7 +29,7 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      window.location.href = "/dashboard";
+      window.location.href = next;
     })();
   }, []);
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Card, Button, Input, PageHeader, Tag } from "@/components/ui";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -8,6 +9,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
   const hasSupabase = !!supabase;
+  const params = useSearchParams();
+  const next = useMemo(() => params.get("next") || "/dashboard", [params]);
 
   async function signInWithEmail() {
     if (!supabase) {
@@ -21,7 +24,7 @@ export default function LoginPage() {
 
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
     });
 
     if (error) {
@@ -40,7 +43,7 @@ export default function LoginPage() {
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
     });
 
     if (error) {
