@@ -1,13 +1,18 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function AuthCallbackPage() {
-  const [msg, setMsg] = useState("处理中...");
+  const [msg, setMsg] = useState("正在处理登录...");
 
   useEffect(() => {
     (async () => {
+      if (!supabase) {
+        setMsg("未配置 Supabase 环境变量，请先设置 NEXT_PUBLIC_SUPABASE_URL 与 NEXT_PUBLIC_SUPABASE_ANON_KEY。");
+        return;
+      }
+
       const url = new URL(window.location.href);
       const code = url.searchParams.get("code");
       if (!code) {

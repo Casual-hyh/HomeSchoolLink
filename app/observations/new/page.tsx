@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, Button, Input, Select, Textarea, Tag } from "@/components/ui";
+import { Card, Button, Input, Select, Textarea, Tag, PageHeader } from "@/components/ui";
 import { loadStore, addObservation } from "@/lib/store";
 import { seed } from "@/lib/seed";
 import { MediaItem } from "@/lib/models";
@@ -24,6 +24,8 @@ export default function NewObservationPage() {
   }, []);
 
   const indicators = useMemo(() => snap.indicators.filter((i) => i.domainId === domainId), [snap, domainId]);
+  const selectedChild = useMemo(() => snap.children.find((c) => c.id === childId), [snap, childId]);
+  const selectedDomain = useMemo(() => snap.domains.find((d) => d.id === domainId), [snap, domainId]);
 
   function toggleIndicator(id: string) {
     setIndicatorIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -69,85 +71,132 @@ export default function NewObservationPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">新建观察</h1>
-        <p className="text-sm text-zinc-500 mt-1">快速记录：选择幼儿 → 选择领域与指标 → 填写文字 →（可选）附件。</p>
-      </div>
+      <PageHeader
+        eyebrow="证据采集"
+        title="新建观察"
+        subtitle="选择幼儿与领域 → 记录情境 → 关联指标，快速完成一条可分析的证据。"
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={() => history.back()}>
+              返回
+            </Button>
+            <Button size="sm" onClick={save} disabled={snap.children.length === 0}>
+              保存记录
+            </Button>
+          </>
+        }
+      />
 
-      <Card title="基本信息">
-        <div className="grid gap-3 md:grid-cols-2">
-          <div>
-            <div className="text-xs text-zinc-500 mb-1">幼儿 *</div>
-            <Select value={childId} onChange={(e) => setChildId(e.target.value)}>
-              <option value="">请选择</option>
-              {snap.children.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </Select>
-            {snap.children.length === 0 ? (
-              <div className="text-xs text-red-600 mt-1">你还没有创建幼儿档案，请先去“幼儿档案”新增。</div>
-            ) : null}
-          </div>
-          <div>
-            <div className="text-xs text-zinc-500 mb-1">发生时间</div>
-            <Input value={occurredAt} onChange={(e) => setOccurredAt(e.target.value)} type="datetime-local" />
-          </div>
-
-          <div>
-            <div className="text-xs text-zinc-500 mb-1">领域 *</div>
-            <Select value={domainId} onChange={(e) => { setDomainId(e.target.value); setIndicatorIds([]); }}>
-              {snap.domains.map((d) => (
-                <option key={d.id} value={d.id}>{d.name}</option>
-              ))}
-            </Select>
-          </div>
-
-          <div>
-            <div className="text-xs text-zinc-500 mb-1">附件（可选）</div>
-            <Input type="file" multiple onChange={onFiles} />
-            {media.length ? (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {media.map((m) => <Tag key={m.id}>{m.kind}:{m.name}</Tag>)}
+      <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="space-y-4">
+          <Card title="基本信息">
+            <div className="grid gap-3 md:grid-cols-2">
+              <div>
+                <div className="text-xs text-slate-500 mb-1">幼儿 *</div>
+                <Select value={childId} onChange={(e) => setChildId(e.target.value)}>
+                  <option value="">请选择</option>
+                  {snap.children.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </Select>
+                {snap.children.length === 0 ? (
+                  <div className="text-xs text-red-600 mt-1">你还没有创建幼儿档案，请先去“幼儿档案”新增。</div>
+                ) : null}
               </div>
+              <div>
+                <div className="text-xs text-slate-500 mb-1">发生时间</div>
+                <Input value={occurredAt} onChange={(e) => setOccurredAt(e.target.value)} type="datetime-local" />
+              </div>
+
+              <div>
+                <div className="text-xs text-slate-500 mb-1">领域 *</div>
+                <Select value={domainId} onChange={(e) => { setDomainId(e.target.value); setIndicatorIds([]); }}>
+                  {snap.domains.map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                </Select>
+              </div>
+
+              <div>
+                <div className="text-xs text-slate-500 mb-1">附件（可选）</div>
+                <Input type="file" multiple onChange={onFiles} />
+                {media.length ? (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {media.map((m) => <Tag key={m.id}>{m.kind}:{m.name}</Tag>)}
+                  </div>
+                ) : (
+                  <div className="text-xs text-slate-500 mt-1">当前仅保存附件元数据；后续接存储后可上传与预览。</div>
+                )}
+              </div>
+
+              <div className="md:col-span-2">
+                <div className="text-xs text-slate-500 mb-1">文字记录</div>
+                <Textarea value={note} onChange={(e) => setNote(e.target.value)} rows={5} placeholder="记录幼儿在活动中的具体表现、情境与教师反思（避免诊断性结论）" />
+              </div>
+            </div>
+          </Card>
+
+          <Card title="关联指标（点击选择）">
+            {indicators.length === 0 ? (
+              <div className="text-sm text-slate-500">该领域暂无指标。可去“指标库”新增园本指标。</div>
             ) : (
-              <div className="text-xs text-zinc-500 mt-1">当前仅保存附件元数据；后续接存储后可真正上传与预览。</div>
+              <div className="flex flex-wrap gap-2">
+                {indicators.map((it) => {
+                  const active = indicatorIds.includes(it.id);
+                  return (
+                    <button
+                      key={it.id}
+                      onClick={() => toggleIndicator(it.id)}
+                      className={
+                        "rounded-full border px-3 py-1 text-sm transition " +
+                        (active ? "bg-slate-900 text-white border-slate-900" : "bg-white/80 hover:bg-white border-slate-200")
+                      }
+                    >
+                      {it.text}
+                    </button>
+                  );
+                })}
+              </div>
             )}
-          </div>
-
-          <div className="md:col-span-2">
-            <div className="text-xs text-zinc-500 mb-1">文字记录</div>
-            <Textarea value={note} onChange={(e) => setNote(e.target.value)} rows={5} placeholder="记录幼儿在活动中的具体表现、情境与教师反思（避免诊断性结论）" />
-          </div>
+          </Card>
         </div>
-      </Card>
 
-      <Card title="关联指标（点击选择）">
-        {indicators.length === 0 ? (
-          <div className="text-sm text-zinc-500">该领域暂无指标。可去“指标库”新增园本指标。</div>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {indicators.map((it) => {
-              const active = indicatorIds.includes(it.id);
-              return (
-                <button
-                  key={it.id}
-                  onClick={() => toggleIndicator(it.id)}
-                  className={
-                    "rounded-full border px-3 py-1 text-sm transition " +
-                    (active ? "bg-zinc-900 text-white border-zinc-900" : "bg-white hover:bg-zinc-100 border-zinc-200")
-                  }
-                >
-                  {it.text}
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </Card>
+        <div className="space-y-4">
+          <Card title="草稿摘要">
+            <div className="space-y-3 text-sm">
+              <div>
+                <div className="text-xs text-slate-500">幼儿</div>
+                <div className="mt-1 font-medium">{selectedChild?.name ?? "未选择"}</div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-500">领域</div>
+                <div className="mt-1 font-medium">{selectedDomain?.name ?? "未选择"}</div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-500">指标</div>
+                <div className="mt-1 flex flex-wrap gap-2">
+                  {indicatorIds.length ? indicatorIds.map((id) => (
+                    <Tag key={id}>{snap.indicators.find((i) => i.id === id)?.text ?? "未知指标"}</Tag>
+                  )) : <Tag>暂无</Tag>}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-500">附件</div>
+                <div className="mt-1">{media.length ? `${media.length} 个附件元数据` : "暂无"}</div>
+              </div>
+              <div className="rounded-xl border border-white/60 bg-white/80 p-3 text-xs text-slate-500">
+                保存后可在“观察中心”进一步编辑、分享给家长或生成报告。
+              </div>
+            </div>
+          </Card>
 
-      <div className="flex gap-2">
-        <Button onClick={save} disabled={snap.children.length === 0}>保存记录</Button>
-        <Button variant="ghost" onClick={() => history.back()}>返回</Button>
+          <Card title="质量提示">
+            <div className="space-y-2 text-xs text-slate-500">
+              <div>建议记录：情境、行为、同伴互动、教师支持策略。</div>
+              <div>避免诊断性结论，强调可观察行为与证据。</div>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );

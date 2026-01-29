@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Card, Button, Select, Textarea, Tag } from "@/components/ui";
+import { Card, Button, Select, Textarea, Tag, PageHeader } from "@/components/ui";
 import { loadStore, getDomainName, getIndicatorText } from "@/lib/store";
 import { seed } from "@/lib/seed";
 
@@ -79,39 +79,49 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">成长报告</h1>
-        <p className="text-sm text-zinc-500 mt-1">基于观察记录自动汇总（频次/领域），输出可编辑文本报告。</p>
+      <PageHeader
+        eyebrow="汇总输出"
+        title="成长报告"
+        subtitle="基于观察记录自动汇总，输出可编辑报告文本与分享摘要。"
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={copy} disabled={!report}>复制报告</Button>
+            <Button size="sm" onClick={generate} disabled={!childId}>生成报告</Button>
+          </>
+        }
+      />
+
+      <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
+        <Card title="选择幼儿">
+          <div className="space-y-4">
+            <div>
+              <div className="text-xs text-slate-500 mb-1">幼儿</div>
+              <Select value={childId} onChange={(e) => setChildId(e.target.value)}>
+                <option value="">请选择</option>
+                {snap.children.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </Select>
+            </div>
+
+            {child ? (
+              <div className="space-y-2 text-sm">
+                <div className="flex flex-wrap gap-2">
+                  <Tag>{child.className ?? "未填班级"}</Tag>
+                  <Tag>{obs.length} 条记录</Tag>
+                </div>
+                <div className="text-xs text-slate-500">建议选择覆盖 4-6 周的记录生成报告。</div>
+              </div>
+            ) : (
+              <div className="text-xs text-slate-500">选择幼儿后显示摘要信息。</div>
+            )}
+          </div>
+        </Card>
+
+        <Card title="报告文本（可直接复制粘贴）">
+          <Textarea value={report} onChange={(e) => setReport(e.target.value)} rows={18} placeholder="点击“生成报告”后这里会出现文本..." />
+        </Card>
       </div>
-
-      <Card title="选择幼儿">
-        <div className="grid gap-3 md:grid-cols-3 items-end">
-          <div className="md:col-span-2">
-            <div className="text-xs text-zinc-500 mb-1">幼儿</div>
-            <Select value={childId} onChange={(e) => setChildId(e.target.value)}>
-              <option value="">请选择</option>
-              {snap.children.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </Select>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={generate} disabled={!childId}>生成</Button>
-            <Button variant="ghost" onClick={copy} disabled={!report}>复制</Button>
-          </div>
-        </div>
-
-        {child ? (
-          <div className="mt-3 flex flex-wrap gap-2 text-sm">
-            <Tag>{child.className ?? "未填班级"}</Tag>
-            <Tag>{obs.length} 条记录</Tag>
-          </div>
-        ) : null}
-      </Card>
-
-      <Card title="报告文本（可直接复制粘贴）">
-        <Textarea value={report} onChange={(e) => setReport(e.target.value)} rows={18} placeholder="点击“生成”后这里会出现报告文本..." />
-      </Card>
     </div>
   );
 }
