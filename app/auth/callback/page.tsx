@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
+export const dynamic = "force-dynamic";
+
 export default function AuthCallbackPage() {
   const [msg, setMsg] = useState("正在处理登录...");
 
