@@ -1,4 +1,4 @@
-﻿import { Card, PageHeader, Tag, Button, Progress } from "@/components/ui";
+import { Card, PageHeader, Tag, Button, Progress } from "@/components/ui";
 
 export default function TasksPage() {
   return (

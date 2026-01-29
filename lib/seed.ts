@@ -1,4 +1,4 @@
-﻿import { StoreSnapshot } from "./models";
+import { StoreSnapshot } from "./models";
 import { getOrInitStore } from "./store";
 
 export const seed: StoreSnapshot = {

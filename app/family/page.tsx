@@ -1,4 +1,4 @@
-﻿import { Card, PageHeader, Tag, Button } from "@/components/ui";
+import { Card, PageHeader, Tag, Button } from "@/components/ui";
 import Link from "next/link";
 
 export default function FamilyPage() {

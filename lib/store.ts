@@ -1,4 +1,4 @@
-﻿import { StoreSnapshot, ChildProfile, Observation, Indicator, Domain } from "./models";
+import { StoreSnapshot, ChildProfile, Observation, Indicator, Domain } from "./models";
 
 const KEY = "hsl_store_v1";
 

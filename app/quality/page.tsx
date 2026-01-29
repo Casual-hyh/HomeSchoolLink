@@ -1,4 +1,4 @@
-﻿import { Card, PageHeader, Tag, Progress, Button } from "@/components/ui";
+import { Card, PageHeader, Tag, Progress, Button } from "@/components/ui";
 
 export default function QualityPage() {
   return (

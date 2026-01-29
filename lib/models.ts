@@ -1,4 +1,4 @@
-﻿export type Domain = {
+export type Domain = {
   id: string;
   name: string; // 健康/语言/社会/科学/艺术...
 };
