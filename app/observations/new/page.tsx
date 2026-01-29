@@ -6,6 +6,7 @@ import { Card, Button, Input, Select, Textarea, Tag, PageHeader } from "@/compon
 import { loadStore, addObservation } from "@/lib/store";
 import { seed } from "@/lib/seed";
 import { MediaItem } from "@/lib/models";
+import { uploadFile } from "@/lib/storage";
 
 export default function NewObservationPage() {
   const router = useRouter();
@@ -31,15 +32,25 @@ export default function NewObservationPage() {
     setIndicatorIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
 
-  function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
-    const items: MediaItem[] = files.map((f) => ({
-      id: `m_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`,
-      kind: f.type.startsWith("image/") ? "image" : f.type.startsWith("video/") ? "video" : f.type.startsWith("audio/") ? "audio" : "file",
-      name: f.name,
-      size: f.size,
-      lastModified: f.lastModified,
-    }));
+    const items: MediaItem[] = await Promise.all(
+      files.map(async (f) => {
+        const upload = await uploadFile(f);
+        return {
+          id: `m_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`,
+          kind: f.type.startsWith("image/") ? "image" : f.type.startsWith("video/") ? "video" : f.type.startsWith("audio/") ? "audio" : "file",
+          name: f.name,
+          size: f.size,
+          lastModified: f.lastModified,
+          provider: upload.provider,
+          storageKey: upload.storageKey,
+          publicUrl: upload.publicUrl,
+          uploadStatus: upload.status,
+          uploadError: upload.error,
+        };
+      })
+    );
     setMedia((prev) => [...prev, ...items]);
     e.target.value = "";
   }
@@ -120,14 +131,32 @@ export default function NewObservationPage() {
               <div>
                 <div className="text-xs text-slate-500 mb-1">附件（可选）</div>
                 <Input type="file" multiple onChange={onFiles} />
-                {media.length ? (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {media.map((m) => <Tag key={m.id}>{m.kind}:{m.name}</Tag>)}
-                  </div>
-                ) : (
-                  <div className="text-xs text-slate-500 mt-1">当前仅保存附件元数据；后续接存储后可上传与预览。</div>
-                )}
+            {media.length ? (
+              <div className="mt-2 space-y-2">
+                <div className="flex flex-wrap gap-2">
+                  {media.map((m) => (
+                    <Tag key={m.id}>
+                      {m.kind}:{m.name} {m.uploadStatus === "pending" ? "· 待上传" : m.uploadStatus === "error" ? "· 上传失败" : ""}
+                    </Tag>
+                  ))}
+                </div>
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                  {media
+                    .filter((m) => m.kind === "image" && m.publicUrl)
+                    .map((m) => (
+                      <img
+                        key={m.id}
+                        src={m.publicUrl}
+                        alt={m.name}
+                        className="h-20 w-full rounded-xl object-cover"
+                      />
+                    ))}
+                </div>
               </div>
+            ) : (
+              <div className="text-xs text-slate-500 mt-1">当前仅保存附件元数据；后续接存储后可上传与预览。</div>
+            )}
+          </div>
 
               <div className="md:col-span-2">
                 <div className="text-xs text-slate-500 mb-1">文字记录</div>

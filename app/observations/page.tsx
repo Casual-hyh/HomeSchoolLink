@@ -103,6 +103,21 @@ export default function ObservationsPage() {
                       {o.media.length ? <Tag>附件 x{o.media.length}</Tag> : null}
                       {o.sharedToFamily ? <Tag className="bg-emerald-50 text-emerald-700">已分享</Tag> : <Tag>未分享</Tag>}
                     </div>
+                    {o.media.some((m) => m.kind === "image" && m.publicUrl) ? (
+                      <div className="mt-3 flex gap-2">
+                        {o.media
+                          .filter((m) => m.kind === "image" && m.publicUrl)
+                          .slice(0, 3)
+                          .map((m) => (
+                            <img
+                              key={m.id}
+                              src={m.publicUrl}
+                              alt={m.name}
+                              className="h-16 w-20 rounded-lg object-cover"
+                            />
+                          ))}
+                      </div>
+                    ) : null}
                   </div>
                 );
               })}
