@@ -10,6 +10,10 @@ export default function LoginClient() {
   const [status, setStatus] = useState("");
   const [checking, setChecking] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
+  const [inviteStatus, setInviteStatus] = useState("");
+  const [inviteSubmitting, setInviteSubmitting] = useState(false);
   const hasSupabase = !!supabase;
   const router = useRouter();
   const params = useSearchParams();
@@ -88,6 +92,55 @@ export default function LoginClient() {
     }
   }
 
+  async function consumeInvite() {
+    if (!inviteEmail.trim()) {
+      setInviteStatus("请输入邮箱。");
+      return;
+    }
+    if (!inviteCode.trim()) {
+      setInviteStatus("请输入邀请码。");
+      return;
+    }
+
+    setInviteSubmitting(true);
+    setInviteStatus("");
+    try {
+      const res = await fetch("/api/admin/invite/consume", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: inviteEmail.trim(), code: inviteCode.trim() }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        setInviteStatus(text || "邀请码无效或已过期。");
+        setInviteSubmitting(false);
+        return;
+      }
+
+      if (!supabase) {
+        setInviteStatus("邀请码已验证，但未配置 Supabase 环境变量。");
+        setInviteSubmitting(false);
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email: inviteEmail.trim(),
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
+      });
+
+      if (error) {
+        setInviteStatus("发送登录链接失败：" + error.message);
+      } else {
+        setInviteStatus("邀请码已激活，登录链接已发送。");
+      }
+    } catch (error) {
+      setInviteStatus((error as Error).message);
+    } finally {
+      setInviteSubmitting(false);
+    }
+  }
+
   if (checking) {
     return (
       <div className="min-h-[60vh] grid place-items-center text-sm text-slate-500">
@@ -146,6 +199,24 @@ export default function LoginClient() {
             <div>已检测到 Supabase 配置，可进行登录。</div>
           )}
           {status ? <div className="mt-3 text-xs text-slate-500">{status}</div> : null}
+        </div>
+      </Card>
+
+      <Card title="管理员邀请码">
+        <div className="space-y-3">
+          <div className="text-xs text-slate-500">仅内部人员使用，邀请码一次性、限时有效。</div>
+          <div>
+            <div className="text-xs text-slate-500 mb-1">管理员邮箱</div>
+            <Input value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="name@example.com" />
+          </div>
+          <div>
+            <div className="text-xs text-slate-500 mb-1">邀请码</div>
+            <Input value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="如：HSL-ADMIN-XXXX" />
+          </div>
+          <Button onClick={consumeInvite} disabled={inviteSubmitting}>
+            {inviteSubmitting ? "验证中..." : "验证并发送登录链接"}
+          </Button>
+          {inviteStatus ? <div className="text-xs text-slate-500">{inviteStatus}</div> : null}
         </div>
       </Card>
 
