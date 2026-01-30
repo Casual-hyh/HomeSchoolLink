@@ -16,7 +16,7 @@ export function Card({
   return (
     <section
       className={
-        "group relative overflow-hidden rounded-2xl p-4 backdrop-blur transition hover:-translate-y-0.5 " +
+        "group relative overflow-hidden rounded-2xl p-4 backdrop-blur transition " +
         "glass-edge " +
         className
       }
