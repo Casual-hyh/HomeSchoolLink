@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -15,30 +15,44 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname() || "/";
   const [checking, setChecking] = useState(true);
+  const [authed, setAuthed] = useState(false);
 
   useEffect(() => {
-    let active = true;
+    let cancelled = false;
 
     async function check() {
       if (isPublic(pathname)) {
-        if (active) setChecking(false);
+        setChecking(false);
         return;
       }
 
       if (!supabase) {
+        setAuthed(false);
+        setChecking(false);
         const next = encodeURIComponent(pathname);
         router.replace(`/login?next=${next}`);
         return;
       }
 
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        const next = encodeURIComponent(pathname);
-        router.replace(`/login?next=${next}`);
-        return;
-      }
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (cancelled) return;
+        if (error || !data.session) {
+          setAuthed(false);
+          setChecking(false);
+          const next = encodeURIComponent(pathname);
+          router.replace(`/login?next=${next}`);
+          return;
+        }
 
-      if (active) setChecking(false);
+        setAuthed(true);
+        setChecking(false);
+      } catch {
+        if (!cancelled) {
+          setAuthed(false);
+          setChecking(false);
+        }
+      }
     }
 
     check();
@@ -46,19 +60,22 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const { data: sub } = supabase
       ? supabase.auth.onAuthStateChange((_event, session) => {
           if (!session && !isPublic(pathname)) {
+            setAuthed(false);
             const next = encodeURIComponent(pathname);
             router.replace(`/login?next=${next}`);
+            return;
           }
+          if (session) setAuthed(true);
         })
       : { data: { subscription: null } };
 
     return () => {
-      active = false;
+      cancelled = true;
       sub?.subscription?.unsubscribe();
     };
   }, [pathname, router]);
 
-  if (checking && !isPublic(pathname)) {
+  if (!isPublic(pathname) && (checking || !authed)) {
     return (
       <div className="min-h-screen grid place-items-center text-sm text-slate-500">
         正在校验登录状态...
