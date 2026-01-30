@@ -16,6 +16,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "/";
   const [checking, setChecking] = useState(true);
   const [authed, setAuthed] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -29,6 +30,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       if (!supabase) {
         setAuthed(false);
         setChecking(false);
+        setRedirecting(true);
         const next = encodeURIComponent(pathname);
         router.replace(`/login?next=${next}`);
         return;
@@ -40,18 +42,19 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         if (error || !data.session) {
           setAuthed(false);
           setChecking(false);
+          setRedirecting(true);
           const next = encodeURIComponent(pathname);
           router.replace(`/login?next=${next}`);
           return;
         }
 
         setAuthed(true);
-        setChecking(false);
       } catch {
         if (!cancelled) {
           setAuthed(false);
-          setChecking(false);
         }
+      } finally {
+        if (!cancelled) setChecking(false);
       }
     }
 
@@ -61,11 +64,15 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       ? supabase.auth.onAuthStateChange((_event, session) => {
           if (!session && !isPublic(pathname)) {
             setAuthed(false);
+            setRedirecting(true);
             const next = encodeURIComponent(pathname);
             router.replace(`/login?next=${next}`);
             return;
           }
-          if (session) setAuthed(true);
+          if (session) {
+            setAuthed(true);
+            setRedirecting(false);
+          }
         })
       : { data: { subscription: null } };
 
@@ -75,10 +82,20 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     };
   }, [pathname, router]);
 
-  if (!isPublic(pathname) && (checking || !authed)) {
+  if (isPublic(pathname)) return <>{children}</>;
+
+  if (checking) {
     return (
       <div className="min-h-screen grid place-items-center text-sm text-slate-500">
         正在校验登录状态...
+      </div>
+    );
+  }
+
+  if (!authed) {
+    return (
+      <div className="min-h-screen grid place-items-center text-sm text-slate-500">
+        {redirecting ? "正在跳转登录..." : "未登录，正在跳转..."}
       </div>
     );
   }
