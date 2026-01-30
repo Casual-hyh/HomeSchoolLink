@@ -76,7 +76,7 @@ export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       className={
-        "w-full rounded-xl border border-slate-200/70 bg-white/80 px-3 py-2 text-sm outline-none transition focus:-translate-y-0.5 focus:ring-2 focus:ring-slate-300/60 " +
+        "w-full rounded-xl border border-slate-200/70 bg-white/80 px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-slate-300/60 " +
         className
       }
       {...rest}
@@ -89,7 +89,7 @@ export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       className={
-        "w-full rounded-xl border border-slate-200/70 bg-white/80 px-3 py-2 text-sm outline-none transition focus:-translate-y-0.5 focus:ring-2 focus:ring-slate-300/60 " +
+        "w-full rounded-xl border border-slate-200/70 bg-white/80 px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-slate-300/60 " +
         className
       }
       {...rest}
@@ -102,7 +102,7 @@ export function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement
   return (
     <textarea
       className={
-        "w-full rounded-xl border border-slate-200/70 bg-white/80 px-3 py-2 text-sm outline-none transition focus:-translate-y-0.5 focus:ring-2 focus:ring-slate-300/60 " +
+        "w-full rounded-xl border border-slate-200/70 bg-white/80 px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-slate-300/60 " +
         className
       }
       {...rest}
