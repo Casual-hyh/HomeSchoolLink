@@ -35,9 +35,9 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       }
 
       try {
-        const { data, error } = await supabase.auth.getSession();
+        const { data, error } = await supabase.auth.getUser();
         if (cancelled) return;
-        if (error || !data.session) {
+        if (error || !data.user) {
           setAuthed(false);
           setChecking(false);
           const next = encodeURIComponent(pathname);
@@ -60,12 +60,12 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     if (!isPublic(pathname)) {
       timeoutId = setTimeout(() => {
         if (!cancelled) setChecking(false);
-      }, 2000);
+      }, 1500);
     }
 
     const { data: sub } = supabase
       ? supabase.auth.onAuthStateChange((_event, session) => {
-          if (session) {
+          if (session?.user) {
             setAuthed(true);
             setChecking(false);
             return;
